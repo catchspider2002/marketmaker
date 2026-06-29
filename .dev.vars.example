@@ -1,0 +1,5 @@
+# Copy this file to `.dev.vars` (gitignored) and fill in real values for `wrangler dev`.
+# For PRODUCTION, do NOT use a file — set with:  wrangler secret put TXLINE_API_KEY
+TXLINE_API_KEY="your_txline_key"
+# Optional — only if you add the plain-English risk summary on the dashboard:
+ANTHROPIC_API_KEY="your_anthropic_key"

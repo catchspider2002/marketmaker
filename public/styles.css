@@ -1,0 +1,28 @@
+:root {
+  --bg: #0f1115; --panel: #171a21; --border: #2a2f3a; --text: #e7e9ee; --muted: #9aa3b2;
+  --green: #3ddc84; --red: #ff6b6b; --amber: #EF9F27; --accent: #5522e0; --mono: ui-monospace, SFMono-Regular, Menlo, monospace;
+}
+* { box-sizing: border-box; }
+body { margin: 0; background: var(--bg); color: var(--text); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+.topbar { display: flex; align-items: center; justify-content: space-between; padding: 12px 18px; border-bottom: 1px solid var(--border); }
+.brand { font-weight: 700; }
+.wrap { max-width: 860px; margin: 0 auto; padding: 18px 16px 64px; }
+.muted { color: var(--muted); }
+.row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; margin-bottom: 10px; }
+.panel { background: var(--panel); border: 1px solid var(--border); border-radius: 12px; padding: 16px; margin: 14px 0; }
+.panel h2 { margin: 0 0 12px; font-size: 15px; }
+.pill { background: #0c0e13; border: 1px solid var(--border); border-radius: 999px; padding: 4px 10px; font-size: 12.5px; color: var(--muted); }
+.input { padding: 9px 11px; background: #0e1016; color: var(--text); border: 1px solid var(--border); border-radius: 8px; font-size: 14px; }
+.input.sm { width: 80px; }
+.btn { padding: 9px 14px; border-radius: 8px; border: 1px solid var(--border); background: #0e1016; color: var(--text); font-weight: 600; cursor: pointer; font-size: 14px; }
+.btn.primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.sep { flex: 1; }
+table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.quotes td, .quotes th, .inv td, .inv th { padding: 8px 10px; text-align: right; border-bottom: 1px solid var(--border); font-family: var(--mono); font-size: 13.5px; }
+.quotes th, .inv th { color: var(--muted); font-weight: 600; text-align: right; font-family: inherit; font-size: 12px; }
+.quotes .lbl, .inv td:first-child { text-align: left; color: var(--muted); font-family: inherit; }
+.st-live { color: var(--green); } .st-paused { color: var(--amber); }
+.pnl { margin-top: 10px; font-family: var(--mono); }
+.pos-pos { color: var(--green); } .pos-neg { color: var(--red); }
+.out { margin-top: 8px; font-family: var(--mono); font-size: 13px; }
+.demo { border-style: dashed; }

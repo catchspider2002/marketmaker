@@ -1,0 +1,104 @@
+// MarketMaker dashboard.
+const qs = (s) => document.querySelector(s);
+const api = (p, o) => fetch(p, o).then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status)); return d; });
+const pct = (x) => (x == null ? '—' : (x * 100).toFixed(1) + '%');
+const MK = ['home', 'draw', 'away'];
+
+let ws = null, fixtureId = null, chart = null;
+
+init();
+async function init() {
+  try {
+    const { fixtures, note } = await api('/api/matches');
+    const sel = qs('#fixture');
+    if (note) { sel.innerHTML = `<option value="">${note}</option>`; return; }
+    sel.innerHTML = '<option value="">Pick a match…</option>' +
+      fixtures.sort((a, b) => a.startTime - b.startTime)
+        .map((f) => `<option value="${f.fixtureId}">${f.home} vs ${f.away}</option>`).join('');
+    sel.addEventListener('change', () => openRoom(sel.value));
+  } catch (e) { qs('#fixture').innerHTML = `<option>Couldn't load: ${e.message}</option>`; }
+
+  qs('#t-exec').addEventListener('click', trade);
+  qs('#m-goal').addEventListener('click', () => fixtureId && api(`/api/mock-event/${fixtureId}`, post({ type: 'goal' })));
+  qs('#m-odds').addEventListener('click', setOdds);
+}
+
+function openRoom(id) {
+  fixtureId = id;
+  if (ws) { try { ws.close(); } catch {} ws = null; }
+  if (!id) return;
+  initChart();
+  const proto = location.protocol === 'https:' ? 'wss' : 'ws';
+  const connect = () => {
+    ws = new WebSocket(`${proto}://${location.host}/api/events/${id}`);
+    ws.onopen = () => { qs('#conn').textContent = '● live'; qs('#conn').style.color = '#3ddc84'; };
+    ws.onclose = () => { qs('#conn').textContent = '○ reconnecting…'; qs('#conn').style.color = ''; if (fixtureId === id) setTimeout(connect, 3000); };
+    ws.onmessage = (ev) => { let m; try { m = JSON.parse(ev.data); } catch { return; } render(m); };
+  };
+  connect();
+}
+
+function render(m) {
+  if (m.type === 'finished') qs('#phase').textContent = 'FULL TIME';
+  const q = m.quotes; const f = m.fair || {};
+  if (q && q.markets) {
+    qs('#phase').textContent = q.phase || '—';
+    for (const mk of MK) {
+      const c = q.markets[mk];
+      qs(`#f-${mk}`).textContent = pct(c.fairValue);
+      qs(`#b-${mk}`).textContent = pct(c.bid);
+      qs(`#a-${mk}`).textContent = pct(c.ask);
+      qs(`#s-${mk}`).textContent = (c.spread * 100).toFixed(1) + 'pp';
+      const st = qs(`#st-${mk}`); st.textContent = c.status.toUpperCase(); st.className = c.status === 'live' ? 'st-live' : 'st-paused';
+    }
+  }
+  if (m.inventory) {
+    qs('#inv-body').innerHTML = MK.map((mk) => {
+      const p = m.inventory[mk];
+      const cls = p.q > 0 ? 'pos-pos' : p.q < 0 ? 'pos-neg' : '';
+      return `<tr><td>${mk}</td><td class="${cls}">${p.q.toFixed(1)}</td><td>${p.q ? pct(p.avgP) : '—'}</td><td>${p.realised.toFixed(3)}</td></tr>`;
+    }).join('');
+  }
+  if (m.pnl) {
+    const t = m.pnl.total;
+    qs('#pnl').innerHTML = `Realised ${m.pnl.realised.toFixed(3)} · Unrealised ${m.pnl.unrealised.toFixed(3)} · ` +
+      `<b class="${t >= 0 ? 'pos-pos' : 'pos-neg'}">Total ${t.toFixed(3)} USDC</b>`;
+  }
+  if (m.log && chart) {
+    chart.data.labels = m.log.map((_, i) => i);
+    chart.data.datasets[0].data = m.log.map((d) => d.home * 100);
+    chart.data.datasets[1].data = m.log.map((d) => d.draw * 100);
+    chart.data.datasets[2].data = m.log.map((d) => d.away * 100);
+    chart.update('none');
+  }
+}
+
+async function trade() {
+  if (!fixtureId) return;
+  const body = { market: qs('#t-market').value, side: qs('#t-side').value, size: Number(qs('#t-size').value) };
+  try {
+    const r = await api(`/api/trade/${fixtureId}`, post(body));
+    qs('#t-out').textContent = r.filled ? `Filled ${body.side} ${body.size} ${body.market} @ ${pct(r.fillPrice)}` : `Rejected: ${r.reason}`;
+  } catch (e) { qs('#t-out').textContent = e.message; }
+}
+
+function setOdds() {
+  if (!fixtureId) return;
+  const d = { home: Number(qs('#o-home').value), draw: Number(qs('#o-draw').value), away: Number(qs('#o-away').value) };
+  const raw = { home: 1 / d.home, draw: 1 / d.draw, away: 1 / d.away };
+  const s = raw.home + raw.draw + raw.away;
+  api(`/api/mock-odds/${fixtureId}`, post({ home: raw.home / s, draw: raw.draw / s, away: raw.away / s }));
+}
+
+function initChart() {
+  const ctx = qs('#chart').getContext('2d');
+  if (chart) chart.destroy();
+  const ds = (label, color) => ({ label, data: [], borderColor: color, backgroundColor: color, tension: 0.3, pointRadius: 0, borderWidth: 2 });
+  chart = new Chart(ctx, {
+    type: 'line',
+    data: { labels: [], datasets: [ds('Home', '#3ddc84'), ds('Draw', '#9aa3b2'), ds('Away', '#ff6b6b')] },
+    options: { animation: false, scales: { y: { title: { display: true, text: 'spread (pp)' }, ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } }, x: { display: false } }, plugins: { legend: { labels: { color: '#e7e9ee' } } } },
+  });
+}
+
+function post(body) { return { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }; }
