@@ -2,9 +2,9 @@ name = "marketmaker"
 main = "src/worker.ts"
 compatibility_date = "2026-01-01"
 
-# Secret (never commit) — set with:
+# Secret (never commit) - set with:
 #   wrangler secret put TXLINE_API_KEY
-# (No Claude API — quoting is pure math. No Container — a Durable Object polls TxLINE
+# (No Claude API - quoting is pure math. No Container - a Durable Object polls TxLINE
 #  odds/scores on an alarm, runs the risk timers, and fans out quotes over WebSocket.)
 
 [assets]

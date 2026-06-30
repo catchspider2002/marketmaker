@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>MarketMaker — In-Play Quotes</title>
+  <title>MarketMaker - In-Play Quotes</title>
   <link rel="stylesheet" href="/styles.css" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
@@ -15,7 +15,7 @@
   <main class="wrap">
     <div class="row">
       <select id="fixture" class="input"><option value="">Loading matches…</option></select>
-      <span id="phase" class="pill">—</span>
+      <span id="phase" class="pill">-</span>
     </div>
 
     <section class="panel">
@@ -23,11 +23,11 @@
       <table class="quotes">
         <thead><tr><th></th><th>Home</th><th>Draw</th><th>Away</th></tr></thead>
         <tbody>
-          <tr><td class="lbl">Fair</td><td id="f-home">—</td><td id="f-draw">—</td><td id="f-away">—</td></tr>
-          <tr><td class="lbl">Bid</td><td id="b-home">—</td><td id="b-draw">—</td><td id="b-away">—</td></tr>
-          <tr><td class="lbl">Ask</td><td id="a-home">—</td><td id="a-draw">—</td><td id="a-away">—</td></tr>
-          <tr><td class="lbl">Spread</td><td id="s-home">—</td><td id="s-draw">—</td><td id="s-away">—</td></tr>
-          <tr><td class="lbl">Status</td><td id="st-home">—</td><td id="st-draw">—</td><td id="st-away">—</td></tr>
+          <tr><td class="lbl">Fair</td><td id="f-home">-</td><td id="f-draw">-</td><td id="f-away">-</td></tr>
+          <tr><td class="lbl">Bid</td><td id="b-home">-</td><td id="b-draw">-</td><td id="b-away">-</td></tr>
+          <tr><td class="lbl">Ask</td><td id="a-home">-</td><td id="a-draw">-</td><td id="a-away">-</td></tr>
+          <tr><td class="lbl">Spread</td><td id="s-home">-</td><td id="s-draw">-</td><td id="s-away">-</td></tr>
+          <tr><td class="lbl">Status</td><td id="st-home">-</td><td id="st-draw">-</td><td id="st-away">-</td></tr>
         </tbody>
       </table>
     </section>
@@ -43,7 +43,7 @@
         <thead><tr><th>Market</th><th>Position</th><th>Avg price</th><th>Realised</th></tr></thead>
         <tbody id="inv-body"></tbody>
       </table>
-      <div id="pnl" class="pnl muted">—</div>
+      <div id="pnl" class="pnl muted">-</div>
     </section>
 
     <section class="panel">

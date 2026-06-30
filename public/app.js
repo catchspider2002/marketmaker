@@ -1,7 +1,7 @@
 // MarketMaker dashboard.
 const qs = (s) => document.querySelector(s);
 const api = (p, o) => fetch(p, o).then(async (r) => { const d = await r.json().catch(() => ({})); if (!r.ok) throw new Error(d.error || ('HTTP ' + r.status)); return d; });
-const pct = (x) => (x == null ? '—' : (x * 100).toFixed(1) + '%');
+const pct = (x) => (x == null ? '-' : (x * 100).toFixed(1) + '%');
 const MK = ['home', 'draw', 'away'];
 
 let ws = null, fixtureId = null, chart = null;
@@ -42,7 +42,7 @@ function render(m) {
   if (m.type === 'finished') qs('#phase').textContent = 'FULL TIME';
   const q = m.quotes; const f = m.fair || {};
   if (q && q.markets) {
-    qs('#phase').textContent = q.phase || '—';
+    qs('#phase').textContent = q.phase || '-';
     for (const mk of MK) {
       const c = q.markets[mk];
       qs(`#f-${mk}`).textContent = pct(c.fairValue);
@@ -56,7 +56,7 @@ function render(m) {
     qs('#inv-body').innerHTML = MK.map((mk) => {
       const p = m.inventory[mk];
       const cls = p.q > 0 ? 'pos-pos' : p.q < 0 ? 'pos-neg' : '';
-      return `<tr><td>${mk}</td><td class="${cls}">${p.q.toFixed(1)}</td><td>${p.q ? pct(p.avgP) : '—'}</td><td>${p.realised.toFixed(3)}</td></tr>`;
+      return `<tr><td>${mk}</td><td class="${cls}">${p.q.toFixed(1)}</td><td>${p.q ? pct(p.avgP) : '-'}</td><td>${p.realised.toFixed(3)}</td></tr>`;
     }).join('');
   }
   if (m.pnl) {

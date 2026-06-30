@@ -1,11 +1,11 @@
-# MarketMaker — Cloudflare Deployment (as built)
+# MarketMaker - Cloudflare Deployment (as built)
 
 **Track:** Trading Tools & Agents · **Subdomain:** `marketmaker.<domain>`
 **Build spec:** see `SPEC.md`. Implementation notes: see `README.md`.
 
 ## Architecture decision: Durable Object polling, NOT a Container
 
-The original plan used a Container running an always-on engine. **The shipped build does not use a Container.** A **QuoteRoom Durable Object** per fixture polls TxLINE odds + scores on an ~8s alarm, recomputes risk-adjusted quotes, runs the pause/widen risk timers, manages inventory, and broadcasts to dashboards over WebSocket. Single `wrangler deploy`, no Docker, no D1 — same Workers + TxLINE-client stack as the other projects.
+The original plan used a Container running an always-on engine. **The shipped build does not use a Container.** A **QuoteRoom Durable Object** per fixture polls TxLINE odds + scores on an ~8s alarm, recomputes risk-adjusted quotes, runs the pause/widen risk timers, manages inventory, and broadcasts to dashboards over WebSocket. Single `wrangler deploy`, no Docker, no D1 - same Workers + TxLINE-client stack as the other projects.
 
 The pause/widen timers (30s pause, 120s 2× spread after an event) are driven by stored timestamps applied on each recompute, so they don't need an always-on process.
 
@@ -14,12 +14,12 @@ The pause/widen timers (30s pause, 120s 2× spread after an event) are driven by
 | Spec component | Cloudflare (shipped) |
 |---|---|
 | `probabilityModel.js` (overround removal) | `src/quoteModel.ts` `fairFromDecimals` / `fairFromPct` (uses TxODDS demargined `Pct`) |
-| `spreadModel.js` (risk-adjusted bid/ask) | `src/quoteModel.ts` `baseHalfSpread` + `quoteMarket` (inventory skew) — judging centrepiece |
+| `spreadModel.js` (risk-adjusted bid/ask) | `src/quoteModel.ts` `baseHalfSpread` + `quoteMarket` (inventory skew) - judging centrepiece |
 | `inventoryManager.js` | `src/inventory.ts` (weighted-avg positions, realised/unrealised, settle) |
 | `riskController.js` (pause/widen on events) | `QuoteRoom` timestamps `pausedUntil` / `widenUntil`, set on goal/red |
 | `quoteEngine.js` | `QuoteRoom.computeAndBroadcast()` on the alarm |
 | `orderBook.js` + `POST /trade` | `QuoteRoom.trade()` via Worker `POST /api/trade/:fixtureId` |
-| TxLINE client | `src/txline.ts` — auth + `fixtures/snapshot` + `odds/snapshot` + `scores/snapshot` |
+| TxLINE client | `src/txline.ts` - auth + `fixtures/snapshot` + `odds/snapshot` + `scores/snapshot` |
 | dashboard | `./public` via Workers `[assets]` (quote board, Chart.js spread history, inventory/P&L, trade terminal) |
 | live feed | `GET /api/events/:fixtureId` WebSocket → QuoteRoom |
 

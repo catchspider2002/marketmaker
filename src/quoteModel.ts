@@ -1,5 +1,5 @@
-// MarketMaker — deterministic quote model. This is the judging centerpiece: every
-// parameter is named and commented. No randomness, no Claude — pure math.
+// MarketMaker - deterministic quote model. This is the judging centerpiece: every
+// parameter is named and commented. No randomness, no Claude - pure math.
 
 export type ThreeWay = { home: number; draw: number; away: number };
 export type Market = keyof ThreeWay;

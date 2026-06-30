@@ -1,4 +1,4 @@
-// MarketMaker — simulated inventory + P&L (per market, per match).
+// MarketMaker - simulated inventory + P&L (per market, per match).
 // All prices are probabilities in [0,1]. MM net position: + = long the outcome, - = short.
 import { Market, MARKETS, ThreeWay } from './quoteModel';
 

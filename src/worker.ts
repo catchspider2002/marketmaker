@@ -1,4 +1,4 @@
-// MarketMaker — Cloudflare Worker. Routes + static dashboard; real-time via QuoteRoom DO.
+// MarketMaker - Cloudflare Worker. Routes + static dashboard; real-time via QuoteRoom DO.
 import { listFixtures } from './txline';
 export { QuoteRoom } from './quoteRoom';
 

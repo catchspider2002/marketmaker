@@ -1,4 +1,4 @@
-// MarketMaker — TxLINE client: auth + fixtures + fair value (odds) + match state (scores).
+// MarketMaker - TxLINE client: auth + fixtures + fair value (odds) + match state (scores).
 import { fairFromPct, ThreeWay } from './quoteModel';
 
 const BASE = 'https://txline.txodds.com';
@@ -24,7 +24,7 @@ async function authedGet(env: TxEnv, path: string): Promise<Response> {
 
 export interface TxFixture { fixtureId: number; competition: string; startTime: number; home: string; away: string; }
 
-// Keep ONLY the senior men's FIFA World Cup 2026 — excludes qualifiers, youth (U-17/U-20),
+// Keep ONLY the senior men's FIFA World Cup 2026 - excludes qualifiers, youth (U-17/U-20),
 // women's, Club World Cup, beach/futsal/esports, and any other edition/year.
 function isMainWorldCup(name: string): boolean {
   const s = (name || '').toLowerCase();

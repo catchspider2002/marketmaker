@@ -1,4 +1,4 @@
-// MarketMaker — QuoteRoom Durable Object. One per fixture.
+// MarketMaker - QuoteRoom Durable Object. One per fixture.
 // Alarm (~8s) polls TxLINE odds (fair value) + scores (events), recomputes risk-adjusted
 // quotes, runs the pause/widen risk timers, and broadcasts to dashboards over WebSocket.
 // Also serves POST /trade (simulated fills) and demo drivers /mock-event, /mock-odds.
@@ -94,7 +94,7 @@ export class QuoteRoom {
     await this.save(s);
   }
 
-  // recompute using last known fair (no network) — used after trades / mock events
+  // recompute using last known fair (no network) - used after trades / mock events
   async recompute(s: State): Promise<void> {
     const fair = s.mockFair || s.lastFair || DEFAULT_FAIR;
     this.computeAndBroadcast(s, fair, s.lastQuotes?.phase || 'NS', null, false);
