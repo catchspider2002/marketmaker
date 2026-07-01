@@ -81,15 +81,14 @@ export async function getMatchState(env: TxEnv, fixtureId: string | number): Pro
   if (!res.ok) return empty;
   const arr = await res.json() as any[];
   if (!Array.isArray(arr) || arr.length === 0) return empty;
-  const latest = arr.reduce((a, b) => ((b?.seq ?? b?.ts ?? 0) > (a?.seq ?? a?.ts ?? 0) ? b : a));
+  const latest = arr.reduce((a, b) => (seqOf(b) > seqOf(a) ? b : a));
   const phase = phaseOf(latest);
-  const st = latest?.stats || {};
-  const sc = latest?.scoreSoccer;
-  const n = (k: string, fb?: number) => (st[k] != null ? num(st[k]) : (fb ?? 0));
-  const g1 = n('1', num(sc?.Participant1?.Total?.Goals));
-  const g2 = n('2', num(sc?.Participant2?.Total?.Goals));
-  const reds = n('5', num(sc?.Participant1?.Total?.RedCards)) + n('6', num(sc?.Participant2?.Total?.RedCards));
-  const p1IsHome = latest?.participant1IsHome !== false;
+  const sm = statMap(latest);
+  const sc = latest?.ScoreSoccer ?? latest?.scoreSoccer;
+  const g1 = sm.get(1) ?? num(sc?.Participant1?.Total?.Goals);
+  const g2 = sm.get(2) ?? num(sc?.Participant2?.Total?.Goals);
+  const reds = (sm.get(5) ?? num(sc?.Participant1?.Total?.RedCards)) + (sm.get(6) ?? num(sc?.Participant2?.Total?.RedCards));
+  const p1IsHome = (latest?.Participant1IsHome ?? latest?.participant1IsHome) !== false;
   const finished = FINISHED.has(phase);
   let winner: MatchState['winner'] = null;
   if (finished) {
@@ -100,11 +99,28 @@ export async function getMatchState(env: TxEnv, fixtureId: string | number): Pro
   return { phase, started: phase !== 'NS', finished, goals: g1 + g2, reds, g1, g2, p1IsHome, winner };
 }
 
+// TxLINE soccer game-phase encoding (numeric id → code). Docs: scores/soccer-feed.
+const PHASE_BY_ID: Record<number, string> = {
+  1: 'NS', 2: 'H1', 3: 'HT', 4: 'H2', 5: 'F', 6: 'WET', 7: 'ET1', 8: 'HTET', 9: 'ET2',
+  10: 'FET', 11: 'WPE', 12: 'PE', 13: 'FPE', 14: 'I', 15: 'A', 16: 'C', 17: 'TXCC', 18: 'TXCS', 19: 'P',
+};
+const PHASE_CODES = new Set(Object.values(PHASE_BY_ID));
 function phaseOf(u: any): string {
-  if (typeof u?.gameState === 'string' && u.gameState) return u.gameState;
-  const s = u?.statusSoccerId;
-  if (typeof s === 'string') return s;
-  if (s && typeof s === 'object') return Object.keys(s)[0] || 'NS';
+  for (const k of Object.keys(u || {})) {
+    if (!/status|phase|gamestate/i.test(k)) continue;
+    let v: any = (u as any)[k];
+    if (v && typeof v === 'object') v = Object.keys(v)[0];
+    if (typeof v === 'number' && PHASE_BY_ID[v]) return PHASE_BY_ID[v];
+    if (typeof v === 'string') { if (PHASE_CODES.has(v)) return v; const n = Number(v); if (Number.isFinite(n) && PHASE_BY_ID[n]) return PHASE_BY_ID[n]; }
+  }
   return 'NS';
+}
+function seqOf(u: any): number { return num(u?.Seq ?? u?.seq ?? u?.Timestamp ?? u?.timestamp ?? u?.Ts ?? u?.ts); }
+function statMap(u: any): Map<number, number> {
+  const m = new Map<number, number>();
+  const s = u?.Stats ?? u?.stats;
+  if (Array.isArray(s)) { for (const it of s) { const k = Number(it?.Key ?? it?.key ?? it?.[0]); if (Number.isFinite(k)) m.set(k, num(it?.Value ?? it?.value ?? it?.[1])); } }
+  else if (s && typeof s === 'object') { for (const k of Object.keys(s)) { const kn = Number(k); if (Number.isFinite(kn)) m.set(kn, num((s as any)[k])); } }
+  return m;
 }
 const num = (x: any) => (Number.isFinite(Number(x)) ? Number(x) : 0);
