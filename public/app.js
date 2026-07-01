@@ -31,7 +31,7 @@ function openRoom(id) {
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   const connect = () => {
     ws = new WebSocket(`${proto}://${location.host}/api/events/${id}`);
-    ws.onopen = () => { qs('#conn').textContent = '● live'; qs('#conn').style.color = '#3ddc84'; };
+    ws.onopen = () => { qs('#conn').textContent = '● live'; qs('#conn').style.color = '#16A34A'; };
     ws.onclose = () => { qs('#conn').textContent = '○ reconnecting…'; qs('#conn').style.color = ''; if (fixtureId === id) setTimeout(connect, 3000); };
     ws.onmessage = (ev) => { let m; try { m = JSON.parse(ev.data); } catch { return; } render(m); };
   };
@@ -96,8 +96,8 @@ function initChart() {
   const ds = (label, color) => ({ label, data: [], borderColor: color, backgroundColor: color, tension: 0.3, pointRadius: 0, borderWidth: 2 });
   chart = new Chart(ctx, {
     type: 'line',
-    data: { labels: [], datasets: [ds('Home', '#3ddc84'), ds('Draw', '#9aa3b2'), ds('Away', '#ff6b6b')] },
-    options: { animation: false, scales: { y: { title: { display: true, text: 'spread (pp)' }, ticks: { color: '#9aa3b2' }, grid: { color: '#2a2f3a' } }, x: { display: false } }, plugins: { legend: { labels: { color: '#e7e9ee' } } } },
+    data: { labels: [], datasets: [ds('Home', '#16A34A'), ds('Draw', '#8888A4'), ds('Away', '#DC2626')] },
+    options: { animation: false, scales: { y: { title: { display: true, text: 'spread (pp)' }, ticks: { color: '#8888A4' }, grid: { color: 'rgba(0,0,0,0.06)' } }, x: { display: false } }, plugins: { legend: { labels: { color: '#1A1A2E', font: { family: 'Inter' } } } } },
   });
 }
 
