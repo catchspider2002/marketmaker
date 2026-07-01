@@ -17,7 +17,8 @@ Live: https://marketmaker.catchspider2002.workers.dev · Repo: https://github.co
 
 ## ⏳ Before submitting
 
-- [ ] **Deploy**: `wrangler secret put TXLINE_API_KEY` → `npm run deploy` (then confirm the live URL above)
+- [x] **Deploy**: secrets set + `npm run deploy` - live at the URL above
+- [ ] **Set `ADMIN_KEY`** and redeploy so the gated demo routes (`/api/mock-event`, `/api/mock-odds`) work via `?admin=`
 - [ ] **Verify**: `GET /api/matches` returns fixtures; dashboard quotes after "Set fair odds"; "Simulate goal" pauses then widens
 - [ ] **Record demo video** (≤5 min): walk `quoteModel.ts`/`inventory.ts`, set odds, trade, simulate a goal (spread chart spike), show `GET /api/quotes/:id` JSON
 - [ ] **Add demo video link** to README + submission form

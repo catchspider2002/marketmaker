@@ -37,7 +37,7 @@ npm run deploy
 ## Demo (no live match needed)
 
 1. Open the dashboard, pick a match.
-2. **Set fair odds** (decimal) in Demo controls → quotes appear around the demargined mid.
+2. **Set fair odds** (decimal) in Demo controls → quotes appear around the demargined mid. (Demo controls are admin-only - open the dashboard with `?admin=YOUR_ADMIN_KEY` to reveal them; normal visitors don't see them.)
 3. Use the **Trade terminal** - buy 50 Home, watch the position fill and the Home ask widen from inventory skew.
 4. Hit **Simulate goal** - quotes go PAUSED for 30s, then return at 2× spread; the spread-history chart spikes.
 5. `POST /api/quotes/:fixtureId` in the browser shows the clean JSON a trading desk would consume.
@@ -52,8 +52,8 @@ For a real in-play match, the DO drives everything automatically from TxLINE odd
 | GET | `/api/quotes/:fixtureId` | current quotes + inventory + P&L (REST) |
 | WS | `/api/events/:fixtureId` | live quote stream |
 | POST | `/api/trade/:fixtureId` | `{ market, side, size }` → fill |
-| POST | `/api/mock-event/:fixtureId` | `{ type:"goal" }` → pause + widen (demo) |
-| POST | `/api/mock-odds/:fixtureId` | `{ home, draw, away }` fair probs (demo) |
+| POST | `/api/mock-event/:fixtureId` | `{ type:"goal" }` → pause + widen (demo) - **requires `X-Admin-Key: $ADMIN_KEY`** |
+| POST | `/api/mock-odds/:fixtureId` | `{ home, draw, away }` fair probs (demo) - **requires `X-Admin-Key: $ADMIN_KEY`** |
 
 ## Notes / limitations (hackathon scope)
 

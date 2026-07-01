@@ -6,6 +6,7 @@ export interface Env {
   ASSETS: Fetcher;
   QUOTE_ROOM: DurableObjectNamespace;
   TXLINE_API_KEY?: string;
+  ADMIN_KEY?: string;
 }
 
 const CORS = {
@@ -44,9 +45,15 @@ export default {
       m = path.match(/^\/api\/trade\/(\w+)$/);
       if (m && req.method === 'POST') return room(env, m[1], '/trade', req);
       m = path.match(/^\/api\/mock-event\/(\w+)$/);
-      if (m && req.method === 'POST') return room(env, m[1], '/mock-event', req);
+      if (m && req.method === 'POST') {
+        if (!env.ADMIN_KEY || req.headers.get('X-Admin-Key') !== env.ADMIN_KEY) return json({ error: 'forbidden' }, 403);
+        return room(env, m[1], '/mock-event', req);
+      }
       m = path.match(/^\/api\/mock-odds\/(\w+)$/);
-      if (m && req.method === 'POST') return room(env, m[1], '/mock-odds', req);
+      if (m && req.method === 'POST') {
+        if (!env.ADMIN_KEY || req.headers.get('X-Admin-Key') !== env.ADMIN_KEY) return json({ error: 'forbidden' }, 403);
+        return room(env, m[1], '/mock-odds', req);
+      }
       return json({ error: 'not found' }, 404);
     } catch (e) {
       return json({ error: String((e as Error).message || e) }, 500);

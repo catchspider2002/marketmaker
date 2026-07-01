@@ -4,7 +4,7 @@ const api = (p, o) => fetch(p, o).then(async (r) => { const d = await r.json().c
 const pct = (x) => (x == null ? '-' : (x * 100).toFixed(1) + '%');
 const MK = ['home', 'draw', 'away'];
 
-let ws = null, fixtureId = null, chart = null;
+let ws = null, fixtureId = null, chart = null, adminKey = null;
 
 init();
 async function init() {
@@ -19,6 +19,21 @@ async function init() {
   } catch (e) { qs('#fixture').innerHTML = `<option>Couldn't load: ${e.message}</option>`; }
 
   qs('#t-exec').addEventListener('click', trade);
+  setupDemo();
+}
+
+// Demo controls (mock goal / mock odds) are admin-only: the panel is hidden for normal visitors
+// and revealed with ?admin=KEY (stored locally). The key rides on X-Admin-Key via post();
+// the gated /api/mock-event and /api/mock-odds reject anything else.
+function setupDemo() {
+  const u = new URL(location.href);
+  let key = u.searchParams.get('admin');
+  if (key) { try { localStorage.setItem('admin_key', key); } catch {} history.replaceState(null, '', u.pathname); }
+  if (!key) { try { key = localStorage.getItem('admin_key'); } catch {} }
+  const panel = qs('#demo-controls');
+  if (!key) { if (panel) panel.style.display = 'none'; return; }
+  adminKey = key;
+  if (panel) panel.style.display = '';
   qs('#m-goal').addEventListener('click', () => fixtureId && api(`/api/mock-event/${fixtureId}`, post({ type: 'goal' })));
   qs('#m-odds').addEventListener('click', setOdds);
 }
@@ -101,4 +116,4 @@ function initChart() {
   });
 }
 
-function post(body) { return { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(body) }; }
+function post(body) { const h = { 'Content-Type': 'application/json' }; if (adminKey) h['X-Admin-Key'] = adminKey; return { method: 'POST', headers: h, body: JSON.stringify(body) }; }
