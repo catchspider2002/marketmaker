@@ -43,7 +43,7 @@ tag = "v1"
 new_classes = ["QuoteRoom"]
 ```
 
-Secret: `TXLINE_API_KEY` only (no `ANTHROPIC_API_KEY`, no Container, no D1).
+Secret: `TXLINE_API_KEY` only (no `DEEPINFRA_API_KEY`, no Container, no D1).
 
 ## Deploy
 

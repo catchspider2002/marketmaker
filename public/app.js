@@ -12,9 +12,11 @@ async function init() {
     const { fixtures, note } = await api('/api/matches');
     const sel = qs('#fixture');
     if (note) { sel.innerHTML = `<option value="">${note}</option>`; return; }
+    // Only live or upcoming matches — drop ones that kicked off > ~2h45m ago (finished).
+    const now = Date.now(); const norm = (t) => (t < 1e12 ? t * 1000 : t);
+    const live = fixtures.filter((f) => norm(f.startTime) >= now - 2.75 * 3600e3).sort((a, b) => norm(a.startTime) - norm(b.startTime));
     sel.innerHTML = '<option value="">Pick a match…</option>' +
-      fixtures.sort((a, b) => a.startTime - b.startTime)
-        .map((f) => `<option value="${f.fixtureId}">${f.home} vs ${f.away}</option>`).join('');
+      live.map((f) => `<option value="${f.fixtureId}">${f.home} vs ${f.away}</option>`).join('');
     sel.addEventListener('change', () => openRoom(sel.value));
   } catch (e) { qs('#fixture').innerHTML = `<option>Couldn't load: ${e.message}</option>`; }
 
