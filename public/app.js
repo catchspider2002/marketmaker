@@ -12,7 +12,7 @@ async function init() {
     const { fixtures, note } = await api('/api/matches');
     const sel = qs('#fixture');
     if (note) { sel.innerHTML = `<option value="">${note}</option>`; return; }
-    // Only live or upcoming matches — drop ones that kicked off > ~2h45m ago (finished).
+    // Only live or upcoming matches - drop ones that kicked off > ~2h45m ago (finished).
     const now = Date.now(); const norm = (t) => (t < 1e12 ? t * 1000 : t);
     const live = fixtures.filter((f) => norm(f.startTime) >= now - 2.75 * 3600e3).sort((a, b) => norm(a.startTime) - norm(b.startTime));
     sel.innerHTML = '<option value="">Pick a match…</option>' +
@@ -30,8 +30,8 @@ async function init() {
 function setupDemo() {
   const u = new URL(location.href);
   let key = u.searchParams.get('admin');
-  if (key) { try { localStorage.setItem('admin_key', key); } catch {} history.replaceState(null, '', u.pathname); }
-  if (!key) { try { key = localStorage.getItem('admin_key'); } catch {} }
+  if (key) { try { localStorage.setItem('admin_key', key); } catch { } history.replaceState(null, '', u.pathname); }
+  if (!key) { try { key = localStorage.getItem('admin_key'); } catch { } }
   const panel = qs('#demo-controls');
   if (!key) { if (panel) panel.style.display = 'none'; return; }
   adminKey = key;
@@ -42,7 +42,7 @@ function setupDemo() {
 
 function openRoom(id) {
   fixtureId = id;
-  if (ws) { try { ws.close(); } catch {} ws = null; }
+  if (ws) { try { ws.close(); } catch { } ws = null; }
   if (!id) return;
   initChart();
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
