@@ -4,7 +4,7 @@ An autonomous market maker that quotes continuous bid/ask prices on in-play Worl
 
 **Stack:** Cloudflare Workers + **Durable Objects** (odds/score polling + WebSocket fan-out) + static dashboard. **No Container, no Claude API - the decision logic is pure, deterministic math.**
 
-- **Live:** https://marketmaker.catchspider2002.workers.dev
+- **Live:** https://marketmaker.wc26hackathon.com
 - **GitHub:** https://github.com/catchspider2002/marketmaker
 - **Demo video:** _add link_
 - **TxLINE endpoints used:** `POST /auth/guest/start`, `GET /api/fixtures/snapshot`, `GET /api/odds/snapshot/{fixtureId}`, `GET /api/scores/snapshot/{fixtureId}`

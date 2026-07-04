@@ -1,7 +1,7 @@
 # MarketMaker - Submission Checklist
 
 Track: **Trading Tools & Agents** (Superteam × TxODDS World Cup Hackathon)
-Live: https://marketmaker.catchspider2002.workers.dev · Repo: https://github.com/catchspider2002/marketmaker
+Live: https://marketmaker.wc26hackathon.com · Repo: https://github.com/catchspider2002/marketmaker
 
 ## ✅ Done
 
