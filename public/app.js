@@ -5,6 +5,8 @@ const pct = (x) => (x == null ? '-' : (x * 100).toFixed(1) + '%');
 const MK = ['home', 'draw', 'away'];
 
 let ws = null, fixtureId = null, chart = null, adminKey = null;
+let fixturesById = {};                                   // fixtureId -> fixture (for team names)
+let names = { home: 'Home', draw: 'Draw', away: 'Away' }; // display names for the selected match
 
 init();
 async function init() {
@@ -15,8 +17,11 @@ async function init() {
     // Only live or upcoming matches - drop ones that kicked off > ~2h45m ago (finished).
     const now = Date.now(); const norm = (t) => (t < 1e12 ? t * 1000 : t);
     const live = fixtures.filter((f) => norm(f.startTime) >= now - 2.75 * 3600e3).sort((a, b) => norm(a.startTime) - norm(b.startTime));
+    fixturesById = Object.fromEntries(live.map((f) => [String(f.fixtureId), f]));
+    const when = (f) => norm(f.startTime) <= now ? 'LIVE' :
+      new Date(norm(f.startTime)).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
     sel.innerHTML = '<option value="">Pick a match…</option>' +
-      live.map((f) => `<option value="${f.fixtureId}">${f.home} vs ${f.away}</option>`).join('');
+      live.map((f) => `<option value="${f.fixtureId}">${f.home} vs ${f.away} · ${when(f)}</option>`).join('');
     sel.addEventListener('change', () => openRoom(sel.value));
   } catch (e) { qs('#fixture').innerHTML = `<option>Couldn't load: ${e.message}</option>`; }
 
@@ -44,6 +49,11 @@ function openRoom(id) {
   fixtureId = id;
   if (ws) { try { ws.close(); } catch { } ws = null; }
   if (!id) return;
+  // Neutral-venue tournament: show team names, not Home/Away, everywhere.
+  const fx = fixturesById[String(id)];
+  names = { home: fx?.home || 'Home', draw: 'Draw', away: fx?.away || 'Away' };
+  qs('#h-home').textContent = names.home; qs('#h-away').textContent = names.away;
+  qs('#tm-home').textContent = names.home; qs('#tm-away').textContent = names.away;
   initChart();
   const proto = location.protocol === 'https:' ? 'wss' : 'ws';
   const connect = () => {
@@ -73,7 +83,7 @@ function render(m) {
     qs('#inv-body').innerHTML = MK.map((mk) => {
       const p = m.inventory[mk];
       const cls = p.q > 0 ? 'pos-pos' : p.q < 0 ? 'pos-neg' : '';
-      return `<tr><td>${mk}</td><td class="${cls}">${p.q.toFixed(1)}</td><td>${p.q ? pct(p.avgP) : '-'}</td><td>${p.realised.toFixed(3)}</td></tr>`;
+      return `<tr><td>${names[mk]}</td><td class="${cls}">${p.q.toFixed(1)}</td><td>${p.q ? pct(p.avgP) : '-'}</td><td>${p.realised.toFixed(3)}</td></tr>`;
     }).join('');
   }
   if (m.pnl) {
@@ -113,7 +123,7 @@ function initChart() {
   const ds = (label, color) => ({ label, data: [], borderColor: color, backgroundColor: color, tension: 0.3, pointRadius: 0, borderWidth: 2 });
   chart = new Chart(ctx, {
     type: 'line',
-    data: { labels: [], datasets: [ds('Home', '#16A34A'), ds('Draw', '#8888A4'), ds('Away', '#DC2626')] },
+    data: { labels: [], datasets: [ds(names.home, '#16A34A'), ds('Draw', '#8888A4'), ds(names.away, '#DC2626')] },
     options: { animation: false, scales: { y: { title: { display: true, text: 'spread (pp)' }, ticks: { color: '#8888A4' }, grid: { color: 'rgba(0,0,0,0.06)' } }, x: { display: false } }, plugins: { legend: { labels: { color: '#1A1A2E', font: { family: 'Inter' } } } } },
   });
 }

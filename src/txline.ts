@@ -54,7 +54,11 @@ export async function getFairValue(env: TxEnv, fixtureId: string | number): Prom
   const arr = await res.json() as any[];
   if (!Array.isArray(arr)) return null;
   const cands = arr.filter((o) => Array.isArray(o.PriceNames) && o.PriceNames.length === 3 && Array.isArray(o.Pct));
-  const pick = cands.find((o) => /stable/i.test(o.Bookmaker || '') || /stable/i.test(o.SuperOddsType || '')) || cands[0];
+  // Prefer the FULL-TIME 1X2 market: in-play snapshots also carry same-shaped period markets
+  // (first-half result etc.), and picking one of those reads as nonsense (a "95% draw" logged in
+  // first-half stoppage was really the H1-result market, not the match odds).
+  const rank = (o: any) => (/1X2/i.test(o.SuperOddsType || '') ? 4 : 0) + (o.MarketPeriod ? 0 : 2) + (/stable/i.test(o.Bookmaker || '') || /stable/i.test(o.SuperOddsType || '') ? 1 : 0);
+  const pick = cands.slice().sort((a, b) => rank(b) - rank(a))[0];
   if (!pick) return null;
   const pct = (pick.Pct as string[]).map((x) => (x === 'NA' ? NaN : Number(x)));
   if (pct.some((x) => !Number.isFinite(x))) return null;

@@ -9,7 +9,7 @@
   <title>MarketMaker - In-Play Quotes</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link rel="stylesheet" href="/styles.css" />
+  <link rel="stylesheet" href="/styles.css?v=2" />
   <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 </head>
 
@@ -32,9 +32,9 @@
         <thead>
           <tr>
             <th></th>
-            <th>Home</th>
+            <th id="h-home">Home</th>
             <th>Draw</th>
-            <th>Away</th>
+            <th id="h-away">Away</th>
           </tr>
         </thead>
         <tbody>
@@ -97,9 +97,9 @@
       <h2>Trade terminal</h2>
       <div class="row">
         <select id="t-market" class="input">
-          <option value="home">Home</option>
+          <option value="home" id="tm-home">Home</option>
           <option value="draw">Draw</option>
-          <option value="away">Away</option>
+          <option value="away" id="tm-away">Away</option>
         </select>
         <select id="t-side" class="input">
           <option value="buy">Buy</option>
@@ -125,7 +125,7 @@
         automatically from TxLINE.</p>
     </section>
   </main>
-  <script src="/app.js"></script>
+  <script src="/app.js?v=2"></script>
 </body>
 
 </html>
