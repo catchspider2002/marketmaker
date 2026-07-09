@@ -6,7 +6,7 @@ An autonomous market maker that quotes continuous bid/ask prices on in-play Worl
 
 - **Live:** https://marketmaker.wc26hackathon.com
 - **GitHub:** https://github.com/catchspider2002/marketmaker
-- **Demo video:** _add link_
+- **Demo video:** https://youtu.be/MYoWaBD5qfY
 - **TxLINE endpoints used:** `POST /auth/guest/start`, `GET /api/fixtures/snapshot`, `GET /api/odds/snapshot/{fixtureId}`, `GET /api/scores/snapshot/{fixtureId}`
 
 ---
